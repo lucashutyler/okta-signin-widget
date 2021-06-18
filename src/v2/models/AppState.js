@@ -155,11 +155,9 @@ export default Model.extend({
     const previousRawState = this.has('idx') ? this.get('idx').rawIdxState : null;
 
     const identicalResponse = _.isEqual(
-      _.nestedOmit(transformedResponse.idx.rawIdxState, ['expiresAt', 'refresh', 'stateHandle']),
-      _.nestedOmit(previousRawState, ['expiresAt', 'refresh', 'stateHandle']));
-    const isSameRefreshInterval = _.isEqual(
-      _.nestedOmit(transformedResponse.idx.rawIdxState, ['expiresAt', 'stateHandle']),
-      _.nestedOmit(previousRawState, ['expiresAt', 'stateHandle']));
+      _.nestedOmit(transformedResponse.idx.rawIdxState, ['refresh']),
+      _.nestedOmit(previousRawState, ['refresh']));
+    const isSameRefreshInterval = _.isEqual(transformedResponse.idx.rawIdxState, previousRawState);
 
     if (identicalResponse && !isSameRefreshInterval) {
       this.set('dynamicRefreshInterval', this.getRefreshInterval(transformedResponse));
@@ -243,10 +241,11 @@ export default Model.extend({
     this.trigger('cache:clear');
   },
 
-  setIonResponse(transformedResponse) {
-    if (!this.shouldReRenderView(transformedResponse)) {
-      return;
-    }
+  setIonResponse(transformedResponse, controller) {
+    // Avoid this. Widget should re-render everytime it receives an idx response.
+    // if (!this.shouldReRenderView(transformedResponse)) {
+    //   return;
+    // }
 
     // `currentFormName` is default to first form of remediations or nothing.
     let currentFormName = null;
@@ -259,17 +258,25 @@ export default Model.extend({
       Logger.error(JSON.stringify(transformedResponse, null, 2));
     }
 
-    this.clearAppStateCache();
+    // Trigger errors from previous state, before updating app state
+    if (transformedResponse.idx?.formError) {
+      this.trigger('showFormErrors', controller, transformedResponse.idx.rawIdxState);
+    }
 
-    // set new app state properties
-    this.set(transformedResponse);
+    // To support polling when response is identical, do not update appstate and do not re-render the view.
+    // constantly re-rendering during poll can cause flickering issue on widget
+    if (this.shouldReRenderView(transformedResponse)) {
+      this.clearAppStateCache();
+      
+      // set new app state properties
+      this.set(transformedResponse);
+      this.set({ currentFormName });
 
-    // make sure change `currentFormName` is last step.
-    // change `currentFormName` will re-render FormController,
-    // which may depend on other derived properties hence
-    // those derived properties must be re-computed before
-    // re-rendering controller.
-    this.set({ currentFormName });
+      // Do not re-render the form, if remediation has formErrors.
+      if (!transformedResponse.idx?.formError) {
+        // trigger a re-render of formController  
+        this.trigger('handleFormNameChange');
+      }
+    }
   }
-
 });
