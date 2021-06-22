@@ -59,7 +59,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.retry-webauthn').css('display')).toBe('none');
     expect(testContext.view.$('.okta-waiting-spinner').css('display')).toBe('block');
     expect(testContext.view.$('.webauthn-not-supported').length).toBe(0);
-
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('shows verify instructions and button when browser supports webauthn on safari', function() {
@@ -72,6 +73,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.retry-webauthn').css('display')).not.toBe('none');
     expect(testContext.view.$('.retry-webauthn').text()).toBe('Verify');
     expect(testContext.view.$('.webauthn-not-supported').length).toBe(0);
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('updated button text to "Retry" on click on safari', function() {
@@ -86,6 +89,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     testContext.view.$('.retry-webauthn').click();
     expect(testContext.view.$('.retry-webauthn').css('display')).toBe('none');
     expect(testContext.view.$('.retry-webauthn').text()).toBe('Retry');
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('shows verify instructions if there are existing enrollments', function() {
@@ -101,6 +106,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.retry-webauthn').css('display')).not.toBe('none'); // default value: empty string in jest, 'inline' in browser
     expect(testContext.view.$('.retry-webauthn').text()).toBe('Verify');
     expect(testContext.view.$('.webauthn-not-supported').length).toBe(0);
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('shows error when browser does not support webauthn', function() {
@@ -113,6 +120,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.webauthn-not-supported').text().trim()).toBe(
       'Security key or biometric authenticator is not supported on this browser. Contact your admin for assistance.'
     );
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('shows UV required callout when userVerification is "required"', function() {
@@ -126,6 +135,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.uv-required-callout').text().trim()).toBe(
       'Biometric verification or a PIN is required to sign in with this authenticator.'
     );
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('does not show UV required callout when userVerification is "discouraged"', function() {
@@ -136,6 +147,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     currentAuthenticator.contextualData.challengeData.userVerification = 'discouraged';
     testContext.init(currentAuthenticator);
     expect(testContext.view.$('.uv-required-callout').length).toBe(0);
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('saveForm is called with model when credentials.get succeeds', function(done) {
@@ -222,5 +235,71 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
         done();
       })
       .catch(done.fail);
+  });
+
+  it('shows correct text when Can\'t verify? is clicked', function() {
+    spyOn(webauthn, 'isNewApiAvailable').and.callFake(() => true);
+    spyOn(BrowserFeatures, 'isSafari').and.callFake(() => false);
+    testContext.init();
+    expect(testContext.view.$('.idx-webauthn-verify-text').text()).toBe(
+      'You will be prompted to use a security key or biometric verification (Windows Hello, Touch ID, etc.). Follow the instructions to complete verification.'
+    );
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
+    const cantVerifyLink = document.getElementsByClassName('link js-cant-verify');
+    cantVerifyLink[0].click();
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
+    expect(testContext.view.$('.js-help-description')[0].textContent).toBe(
+      'Are you trying to use a biometric authenticator?Biometric authenticators (fingerprint, face recognition, PIN) will only work on the same device on which they were set up.If available, set up another security method that supports verification from a mobile browser.Are you trying to use a security key?Insert your security key into a USB port when propmted by the browser and tap on the button or gold disk. Security keys can work on multiple devices.'
+    );
+  });
+
+  it('shows additional text when Can\'t verify? is clicked from Okta_Authenticator', function() {
+    testContext.init = (
+      currentAuthenticator = ChallengeWebauthnResponse.currentAuthenticator.value,
+      authenticatorEnrollments = [],
+      app = { name: 'Okta_Authenticator' },
+    ) => {
+      const appState = new AppState({
+        currentAuthenticator,
+        authenticatorEnrollments,
+        app,
+      });
+      spyOn(appState, 'getRemediationAuthenticationOptions').and.callFake(formName => {
+        if (formName === 'select-authenticator-authenticate') {
+          return [{label: 'some authenticator '}];
+        }
+        return [];
+      });
+      spyOn(appState, 'shouldShowSignOutLinkInCurrentForm').and.returnValue(false);
+      const settings = new Settings({baseUrl: 'http://localhost:3000'});
+      const currentViewState = {
+        name: 'challenge-authenticator',
+        relatesTo: {
+          value: currentAuthenticator,
+        },
+      };
+      testContext.view = new ChallengeWebauthnView({
+        el: $sandbox,
+        appState,
+        settings,
+        currentViewState,
+      });
+      testContext.view.render();
+    }
+    spyOn(webauthn, 'isNewApiAvailable').and.callFake(() => true);
+    spyOn(BrowserFeatures, 'isSafari').and.callFake(() => false);
+    testContext.init();
+    expect(testContext.view.$('.idx-webauthn-verify-text').text()).toBe(
+      'You will be prompted to use a security key or biometric verification (Windows Hello, Touch ID, etc.). Follow the instructions to complete verification.'
+    );
+    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
+    const cantVerifyLink = document.getElementsByClassName('link js-cant-verify');
+    cantVerifyLink[0].click();
+    expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
+    expect(testContext.view.$('.js-help-description')[0].textContent).toBe(
+      'On a different device, navigate to your Okta Dashboard e.g. your company.okta.comNavigate to Settings > Extra VerificationOn Okta Verify, click "Enable"Scan the QR code using Okta Verify on this device and follow instructions to finish enrolling your account'
+    );
   });
 });
