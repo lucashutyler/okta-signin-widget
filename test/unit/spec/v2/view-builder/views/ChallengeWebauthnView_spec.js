@@ -286,7 +286,7 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
         currentViewState,
       });
       testContext.view.render();
-    }
+    };
     spyOn(webauthn, 'isNewApiAvailable').and.callFake(() => true);
     spyOn(BrowserFeatures, 'isSafari').and.callFake(() => false);
     testContext.init();
@@ -299,7 +299,7 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     cantVerifyLink[0].click();
     expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
     expect(testContext.view.$('.js-help-description')[0].textContent).toBe(
-      'On a different device, navigate to your Okta Dashboard e.g. your company.okta.comNavigate to Settings > Extra VerificationOn Okta Verify, click "Enable"Scan the QR code using Okta Verify on this device and follow instructions to finish enrolling your account'
+      'Open your Okta Dashboard (e.g. yourcompany.okta.com) on the device you used to setup your security key or biometric authenticatorGo to Settings > Security MethodsOn Okta Verify, click "Enable"Scan the QR code using Okta Verify and follow instructions to finish enrolling your account'
     );
   });
 });
