@@ -1,4 +1,4 @@
-import {loc, createButton, createCallout, _, $, View} from 'okta';
+import { loc, createButton, createCallout } from 'okta';
 import { BaseForm } from '../../internals';
 import BaseAuthenticatorView from '../../components/BaseAuthenticatorView';
 import CryptoUtil from '../../../../util/CryptoUtil';
@@ -6,39 +6,7 @@ import webauthn from '../../../../util/webauthn';
 import BrowserFeatures from '../../../../util/BrowserFeatures';
 import ChallengeWebauthnInfoView from './ChallengeWebauthnInfoView';
 import { getMessageFromBrowserError } from '../../../ion/i18nTransformer';
-import AuthenticatorFooter from '../../components/AuthenticatorFooter';
-import { getBackToSignInLink } from '../../utils/LinksUtil';
-import Link from '../../components/Link';
-import hbs from 'handlebars-inline-precompile';
-
-const CantVerifyInfoVerifyFlowTemplate = View.extend({
-  id: 'help-description-container',
-  className: 'help-description js-help-description',
-  template: hbs`
-    <div className="help-description js-help-description" id="help-description-container">
-      <h3>{{i18n code="oie.verify.webauthn.cant.verify.biometric.authenticator.title" bundle="login"}}</h3><br>
-      <p>{{i18n code="oie.verify.webauthn.cant.verify.biometric.authenticator.description1" bundle="login"}}</p><br>
-      <p>{{i18n code="oie.verify.webauthn.cant.verify.biometric.authenticator.description2" bundle="login"}}</p><br>
-      <h3>{{i18n code="oie.verify.webauthn.cant.verify.security.key.title" bundle="login"}}</h3><br>
-      <p>{{i18n code="oie.verify.webauthn.cant.verify.security.key.description" bundle="login"}}</p><br>
-    </div>
-  `,
-});
-
-const CantVerifyInfoOVEnrollmentFlowTemplate = View.extend({
-  id: 'help-description-container',
-  className: 'help-description js-help-description',
-  template: hbs`
-    <div className="help-description js-help-description" id="help-description-container">
-      <ol class="ov-enrollment-info">
-        <li>{{i18n code="oie.verify.webauthn.cant.verify.enrollment.step1" bundle="login"}}</li><br>
-        <li>{{i18n code="oie.verify.webauthn.cant.verify.enrollment.step2" bundle="login"}}</li><br>
-        <li>{{i18n code="oie.verify.webauthn.cant.verify.enrollment.step3" bundle="login"}}</li><br>
-        <li>{{i18n code="oie.verify.webauthn.cant.verify.enrollment.step4" bundle="login"}}</><br>
-      </ol>
-    </div>
-  `,
-});
+import ChallengeWebauthnFooter from '../../components/ChallengeWebauthnFooter';
 
 const Body = BaseForm.extend({
 
@@ -148,93 +116,9 @@ const Body = BaseForm.extend({
   }
 });
 
-const Footer = AuthenticatorFooter.extend({
-  props: {
-    enabled: ['boolean', false]
-  },
-
-  events: {
-    'click .js-cant-verify': function(e) {
-      e.preventDefault();
-      if (!this.props.enabled) {
-        return;
-      }
-      this.toggleLinks(e);
-    },
-  },
-
-  initialize: function() {
-    let links = _.resultCtx(this, 'links', this);
-    const footerInfo = _.resultCtx(this, 'footerInfo', this);
-    const hasBackToSignInLink = _.resultCtx(this, 'hasBackToSignInLink', this);
-
-    if (!Array.isArray(links)) {
-      links = [];
-    } else {
-      links = links.filter(l => $.isPlainObject(l));
-    }
-
-    if (this.options.appState.shouldShowSignOutLinkInCurrentForm(
-      this.options.settings.get('features.hideSignOutLinkInMFA') ||
-      this.settings.get('features.mfaOnlyFlow')) && hasBackToSignInLink) {
-      links = links.concat(getBackToSignInLink(this.options.settings));
-    }
-
-    links.forEach(link => {
-      this.add(Link, {
-        options: link,
-      });
-      if (link.name === 'cant-verify') {
-        if (this.options.appState.get('app') && this.options.appState.get('app').name === 'Okta_Authenticator') {
-          this.add(CantVerifyInfoOVEnrollmentFlowTemplate);
-        } else {
-          this.add(CantVerifyInfoVerifyFlowTemplate);
-        }
-      }
-    });
-
-    if (footerInfo) {
-      this.add(View.extend({
-        className: 'footer-info',
-      }));
-
-      this.add(footerInfo, '.footer-info');
-    }
-
-    this.listenTo(this.props.enabled, 'change:enabled', function(model, enable) {
-      this.$('.link').toggleClass('o-form-disabled', !enable);
-    });
-  },
-
-  links: function() {
-    let links = AuthenticatorFooter.prototype.links.apply(this, arguments);
-    links.push({
-      'label': loc('oie.verify.webauthn.cant.verify', 'login'),
-      'name': 'cant-verify',
-      'href': '#',
-      'aria-expanded': false,
-      'aria-controls': 'help-description-container',
-      'class': 'link help js-help',
-    });
-
-    return links;
-  },
-
-  postRender: function() {
-    this.$('.js-help-description').hide();
-  },
-
-  toggleLinks: function(e) {
-    e.preventDefault();
-    this.$('.js-help-description').slideToggle(200, () => {
-      this.$('.js-help').attr('aria-expanded', this.$('.js-help-description').is(':visible'));
-    });
-  },
-});
-
 export default BaseAuthenticatorView.extend({
   Body,
-  Footer,
+  Footer: ChallengeWebauthnFooter,
   postRender() {
     BaseAuthenticatorView.prototype.postRender.apply(this, arguments);
     // Trigger browser prompt automatically for other browsers for better UX.
