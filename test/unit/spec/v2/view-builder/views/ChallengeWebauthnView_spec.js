@@ -59,8 +59,6 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.retry-webauthn').css('display')).toBe('none');
     expect(testContext.view.$('.okta-waiting-spinner').css('display')).toBe('block');
     expect(testContext.view.$('.webauthn-not-supported').length).toBe(0);
-    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
-    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('shows verify instructions and button when browser supports webauthn on safari', function() {
@@ -73,8 +71,6 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.retry-webauthn').css('display')).not.toBe('none');
     expect(testContext.view.$('.retry-webauthn').text()).toBe('Verify');
     expect(testContext.view.$('.webauthn-not-supported').length).toBe(0);
-    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
-    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('updated button text to "Retry" on click on safari', function() {
@@ -89,8 +85,6 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     testContext.view.$('.retry-webauthn').click();
     expect(testContext.view.$('.retry-webauthn').css('display')).toBe('none');
     expect(testContext.view.$('.retry-webauthn').text()).toBe('Retry');
-    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
-    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('shows verify instructions if there are existing enrollments', function() {
@@ -106,8 +100,6 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.retry-webauthn').css('display')).not.toBe('none'); // default value: empty string in jest, 'inline' in browser
     expect(testContext.view.$('.retry-webauthn').text()).toBe('Verify');
     expect(testContext.view.$('.webauthn-not-supported').length).toBe(0);
-    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
-    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('shows error when browser does not support webauthn', function() {
@@ -120,8 +112,6 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.webauthn-not-supported').text().trim()).toBe(
       'Security key or biometric authenticator is not supported on this browser. Contact your admin for assistance.'
     );
-    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
-    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('shows UV required callout when userVerification is "required"', function() {
@@ -135,8 +125,6 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     expect(testContext.view.$('.uv-required-callout').text().trim()).toBe(
       'Biometric verification or a PIN is required to sign in with this authenticator.'
     );
-    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
-    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('does not show UV required callout when userVerification is "discouraged"', function() {
@@ -147,8 +135,6 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     currentAuthenticator.contextualData.challengeData.userVerification = 'discouraged';
     testContext.init(currentAuthenticator);
     expect(testContext.view.$('.uv-required-callout').length).toBe(0);
-    expect(testContext.view.$('.js-cant-verify').length).toBe(1);
-    expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
   });
 
   it('saveForm is called with model when credentials.get succeeds', function(done) {
@@ -250,7 +236,7 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     cantVerifyLink[0].click();
     expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
     expect(testContext.view.$('.js-help-description')[0].textContent).toBe(
-      'Are you trying to use a biometric authenticator?Biometric authenticators (fingerprint, face recognition, PIN) will only work on the same device on which they were set up.If available, set up another security method that supports verification from a mobile browser.Are you trying to use a security key?Insert your security key into a USB port when propmted by the browser and tap on the button or gold disk. Security keys can work on multiple devices.'
+      'Are you trying to use a biometric authenticator?Biometric authenticators (fingerprint, face recognition, PIN) will only work on the same device on which they were set up.If available, set up another security method on the device you used to set up your biometric authenticator.Are you trying to use a security key?If you have set up a security key, insert it in a USB port when prompted by the browser and tap on the button or gold disk. Security keys can work on multiple devices.'
     );
   });
 
