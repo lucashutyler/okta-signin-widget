@@ -1,87 +1,59 @@
-import AuthenticatorFooter from './AuthenticatorFooter';
-import { $, _, loc, View } from 'okta';
-import { getBackToSignInLink } from '../utils/LinksUtil';
-import Link from './Link';
+/*!
+ * Copyright (c) 2020, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
+import { $, loc, View } from 'okta';
 import hbs from 'handlebars-inline-precompile';
+import AuthenticatorFooter from './AuthenticatorFooter';
 
-const CantVerifyInfoVerifyFlowTemplate = View.extend({
+const OKTA_AUTHENTICATOR = 'Okta_Authenticator';
+
+const CantVerifyInfoVerifyFlowView = View.extend({
   id: 'help-description-container',
   className: 'help-description js-help-description',
   template: hbs`
-    <div className="help-description js-help-description" id="help-description-container">
       <h3>{{i18n code="oie.verify.webauthn.cant.verify.biometric.authenticator.title" bundle="login"}}</h3><br>
       <p>{{i18n code="oie.verify.webauthn.cant.verify.biometric.authenticator.description1" bundle="login"}}</p><br>
       <p>{{i18n code="oie.verify.webauthn.cant.verify.biometric.authenticator.description2" bundle="login"}}</p><br>
       <h3>{{i18n code="oie.verify.webauthn.cant.verify.security.key.title" bundle="login"}}</h3><br>
       <p>{{i18n code="oie.verify.webauthn.cant.verify.security.key.description" bundle="login"}}</p><br>
-    </div>
   `,
 });
 
-const CantVerifyInfoOVEnrollmentFlowTemplate = View.extend({
+const CantVerifyInfoOVEnrollmentFlowView = View.extend({
   id: 'help-description-container',
   className: 'help-description js-help-description',
   template: hbs`
-    <div className="help-description js-help-description" id="help-description-container">
       <ol class="ov-enrollment-info">
         <li>{{i18n code="oie.verify.webauthn.cant.verify.enrollment.step1" bundle="login"}}</li><br>
         <li>{{i18n code="oie.verify.webauthn.cant.verify.enrollment.step2" bundle="login"}}</li><br>
         <li>{{i18n code="oie.verify.webauthn.cant.verify.enrollment.step3" bundle="login"}}</li><br>
         <li>{{i18n code="oie.verify.webauthn.cant.verify.enrollment.step4" bundle="login"}}</><br>
       </ol>
-    </div>
   `,
 });
 
 export default AuthenticatorFooter.extend({
-
-  initialize: function() {
-    let links = _.resultCtx(this, 'links', this);
-    const footerInfo = _.resultCtx(this, 'footerInfo', this);
-    const hasBackToSignInLink = _.resultCtx(this, 'hasBackToSignInLink', this);
-
-    if (!Array.isArray(links)) {
-      links = [];
-    } else {
-      links = links.filter(l => $.isPlainObject(l));
-    }
-
-    if (this.options.appState.shouldShowSignOutLinkInCurrentForm(
-      this.options.settings.get('features.hideSignOutLinkInMFA') ||
-      this.settings.get('features.mfaOnlyFlow')) && hasBackToSignInLink) {
-      links = links.concat(getBackToSignInLink(this.options.settings));
-    }
-
-    links.forEach(link => {
-      this.add(Link, {
-        options: link,
-      });
-      if (link.name === 'cant-verify') {
-        if (this.options.appState.get('app') && this.options.appState.get('app').name === 'Okta_Authenticator') {
-          this.add(CantVerifyInfoOVEnrollmentFlowTemplate);
-        } else {
-          this.add(CantVerifyInfoVerifyFlowTemplate);
-        }
-      }
-    });
-
-    if (footerInfo) {
-      this.add(View.extend({
-        className: 'footer-info',
-      }));
-
-      this.add(footerInfo, '.footer-info');
-    }
-  },
-
   links: function() {
     const links = AuthenticatorFooter.prototype.links.apply(this, arguments);
-    links.push({
+
+    const cantVerifyInfoView = this.options.appState.get('app')
+      && this.options.appState.get('app').name === OKTA_AUTHENTICATOR ?
+      CantVerifyInfoOVEnrollmentFlowView: CantVerifyInfoVerifyFlowView;
+    links.unshift({
       'label': loc('oie.verify.webauthn.cant.verify', 'login'),
       'name': 'cant-verify',
       'aria-expanded': false,
       'aria-controls': 'help-description-container',
       'class': 'link help js-help',
+      'linkInfo': cantVerifyInfoView,
       'clickHandler': function() {
         $('.js-help-description').slideToggle(200, () => {
           $('.js-help').attr('aria-expanded', $('.js-help-description').is(':visible'));

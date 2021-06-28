@@ -224,19 +224,19 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
   });
 
   it('shows correct text when Can\'t verify? is clicked', function() {
-    spyOn(webauthn, 'isNewApiAvailable').and.callFake(() => true);
-    spyOn(BrowserFeatures, 'isSafari').and.callFake(() => false);
+    jest.spyOn(webauthn, 'isNewApiAvailable').mockReturnValue(true);
+    jest.spyOn(BrowserFeatures, 'isSafari').mockReturnValue(false);
     testContext.init();
-    expect(testContext.view.$('.idx-webauthn-verify-text').text()).toBe(
-      'You will be prompted to use a security key or biometric verification (Windows Hello, Touch ID, etc.). Follow the instructions to complete verification.'
+    expect(testContext.view.$('.idx-webauthn-verify-text').text()).toMatchInlineSnapshot(
+      '"You will be prompted to use a security key or biometric verification (Windows Hello, Touch ID, etc.). Follow the instructions to complete verification."'
     );
     expect(testContext.view.$('.js-cant-verify').length).toBe(1);
     expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
     const cantVerifyLink = document.getElementsByClassName('link js-cant-verify');
     cantVerifyLink[0].click();
     expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
-    expect(testContext.view.$('.js-help-description')[0].textContent).toBe(
-      'Are you trying to use a biometric authenticator?Biometric authenticators (fingerprint, face recognition, PIN) will only work on the same device on which they were set up.If available, set up another security method on the device you used to set up your biometric authenticator.Are you trying to use a security key?If you have set up a security key, insert it in a USB port when prompted by the browser and tap on the button or gold disk. Security keys can work on multiple devices.'
+    expect(testContext.view.$('.js-help-description')[0].textContent).toMatchInlineSnapshot(
+      '"Are you trying to use a biometric authenticator?Biometric authenticators (fingerprint, face recognition, PIN) will only work on the same device on which they were set up.If available, set up another security method on the device you used to set up your biometric authenticator.Are you trying to use a security key?If you have set up a security key, insert it in a USB port when prompted by the browser and tap on the button or gold disk. Security keys can work on multiple devices."'
     );
   });
 
@@ -251,14 +251,14 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
         authenticatorEnrollments,
         app,
       });
-      spyOn(appState, 'getRemediationAuthenticationOptions').and.callFake(formName => {
+      jest.spyOn(appState, 'getRemediationAuthenticationOptions').mockReturnValue(formName => {
         if (formName === 'select-authenticator-authenticate') {
           return [{label: 'some authenticator '}];
         }
         return [];
       });
-      spyOn(appState, 'shouldShowSignOutLinkInCurrentForm').and.returnValue(false);
-      const settings = new Settings({baseUrl: 'http://localhost:3000'});
+      jest.spyOn(appState, 'shouldShowSignOutLinkInCurrentForm').mockReturnValue(false);
+      const settings = new Settings({ baseUrl: 'http://localhost:3000' });
       const currentViewState = {
         name: 'challenge-authenticator',
         relatesTo: {
@@ -273,19 +273,19 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
       });
       testContext.view.render();
     };
-    spyOn(webauthn, 'isNewApiAvailable').and.callFake(() => true);
-    spyOn(BrowserFeatures, 'isSafari').and.callFake(() => false);
+    jest.spyOn(webauthn, 'isNewApiAvailable').mockReturnValue(true);
+    jest.spyOn(BrowserFeatures, 'isSafari').mockReturnValue(false);
     testContext.init();
-    expect(testContext.view.$('.idx-webauthn-verify-text').text()).toBe(
-      'You will be prompted to use a security key or biometric verification (Windows Hello, Touch ID, etc.). Follow the instructions to complete verification.'
+    expect(testContext.view.$('.idx-webauthn-verify-text').text()).toMatchInlineSnapshot(
+      '"You will be prompted to use a security key or biometric verification (Windows Hello, Touch ID, etc.). Follow the instructions to complete verification."'
     );
     expect(testContext.view.$('.js-cant-verify').length).toBe(1);
     expect(testContext.view.$('.js-help-description').css('display')).toBe('none');
     const cantVerifyLink = document.getElementsByClassName('link js-cant-verify');
     cantVerifyLink[0].click();
     expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
-    expect(testContext.view.$('.js-help-description')[0].textContent).toBe(
-      'Open your Okta Dashboard (e.g. yourcompany.okta.com) on the device you used to setup your security key or biometric authenticatorGo to Settings > Security MethodsOn Okta Verify, click "Enable"Scan the QR code using Okta Verify and follow instructions to finish enrolling your account'
+    expect(testContext.view.$('.js-help-description')[0].textContent).toMatchInlineSnapshot(
+      '"Open your Okta Dashboard (e.g. yourcompany.okta.com) on the device you used to setup your security key or biometric authenticatorGo to Settings > Security MethodsOn Okta Verify, click \\"Enable\\"Scan the QR code using Okta Verify and follow instructions to finish enrolling your account"'
     );
   });
 });
