@@ -63,18 +63,11 @@ export default View.extend({
     }
 
     links.forEach(link => {
-      if (link.linkInfo) {
-        this.add(ToggleTextLink, {
-          options : {
-            link: new Link({ options : link }),
-            linkInfo: link.linkInfo,
-          }
-        });
-      } else {
-        this.add(Link, {
-          options: link,
-        });
+      let LinkView = Link;
+      if (link.type === 'toggle-text-link') {
+        LinkView = ToggleTextLink;
       }
+      this.add(LinkView, { options: link, });
     });
 
     if (footerInfo) {

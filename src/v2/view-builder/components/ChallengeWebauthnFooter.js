@@ -50,14 +50,12 @@ export default AuthenticatorFooter.extend({
     links.unshift({
       'label': loc('oie.verify.webauthn.cant.verify', 'login'),
       'name': 'cant-verify',
-      'aria-expanded': false,
       'aria-controls': 'help-description-container',
       'class': 'link help js-help',
-      'linkInfo': cantVerifyInfoView,
-      'clickHandler': function() {
-        $('.js-help-description').slideToggle(200, () => {
-          $('.js-help').attr('aria-expanded', $('.js-help-description').is(':visible'));
-        });
+      'type': 'toggle-text-link',
+      'additionalOptions': {
+        view: cantVerifyInfoView,
+        selector: '.js-help-description',
       },
     });
 

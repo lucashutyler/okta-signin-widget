@@ -285,7 +285,7 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     cantVerifyLink[0].click();
     expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
     expect(testContext.view.$('.js-help-description')[0].textContent).toMatchInlineSnapshot(
-      '"Open your Okta Dashboard (e.g. yourcompany.okta.com) on the device you used to setup your security key or biometric authenticatorGo to Settings > Security MethodsOn Okta Verify, click \\"Enable\\"Scan the QR code using Okta Verify and follow instructions to finish enrolling your account"'
+      '"Open your Okta Dashboard (e.g. yourcompany.okta.com) on the device you used to setup your security key or biometric authenticatorGo to Settings > Security MethodsOn Okta Verify, click \\"Set up\\"Scan the QR code using Okta Verify and follow instructions to finish enrolling your account"'
     );
   });
 });

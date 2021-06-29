@@ -10,31 +10,25 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { View } from 'okta';
+import { View, $ } from 'okta';
 import { BaseView } from '../internals';
 import Link from './Link';
 
 export default View.extend({
-
-  /**
-   * View
-   * the link
-   */
-  link: null,
-
-  /**
-   * View
-   * adds any view under the link
-   */
-  linkInfo: null,
-
   initialize() {
     BaseView.prototype.initialize.apply(this, arguments);
-    this.add(Link, {
-      options: this.options.link.options.options,
-    });
-    if (this.options.linkInfo) {
-      this.add(this.options.linkInfo);
-    }
+    const textViewOptions = this.options.additionalOptions;
+    const linkOptions = Object.assign({}, this.options,
+      {
+        'type': 'link',
+        'aria-expanded': false,
+        'clickHandler': function() {
+          $(textViewOptions.selector).slideToggle(200, () => {
+            $(textViewOptions.selector).attr('aria-expanded', false);
+          });
+        }
+      });
+    this.add(Link, { options: linkOptions });
+    this.add(textViewOptions.view);
   }
 });
