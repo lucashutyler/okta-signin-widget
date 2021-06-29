@@ -25,14 +25,14 @@ test('shows the correct content', async t => {
   await t.expect(signInDevicePage.getHeader()).eql('Sign In');
   await t.expect(signInDevicePage.getOVButtonIcon()).eql('icon okta-verify-authenticator');
   await t.expect(signInDevicePage.getContentText()).eql('To access this resource, your organization requires you to sign in using your device.');
-  await t.expect(signInDevicePage.getOVButtonLabel()).eql('Sign in using Okta Verify on this device');
+  await t.expect(signInDevicePage.getOVButtonLabel()).eql('Sign in with Okta Fastpass');
 });
 
 test('clicking the launch Okta Verify button takes user to the right UI', async t => {
   const signInDevicePage = await setup(t);
   await signInDevicePage.clickLaunchOktaVerifyButton();
   const header = new Selector('h2[data-se="o-form-head"]');
-  await t.expect(header.textContent).eql('Click "Open Okta Verify" on the browser prompt');
+  await t.expect(header.textContent).eql('Sign in with Okta Fastpass');
 });
 
 test('shows the correct footer links', async t => {

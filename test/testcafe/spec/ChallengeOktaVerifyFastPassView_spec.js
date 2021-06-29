@@ -144,7 +144,7 @@ test
     await setupLoopbackFallback(t);
     const deviceChallengePollPageObject = new DeviceChallengePollPageObject(t);
     await t.expect(deviceChallengePollPageObject.getBeaconClass()).contains(BEACON_CLASS);
-    await t.expect(deviceChallengePollPageObject.getHeader()).eql('Click "Open Okta Verify" on the browser prompt');
+    await t.expect(deviceChallengePollPageObject.getHeader()).eql('Sign in with Okta Fastpass');
     const content = deviceChallengePollPageObject.getContent();
     await t.expect(content).contains('Didn’t get a prompt?');
     await t.expect(content).contains('Launch Okta Verify');
@@ -183,7 +183,7 @@ test
     deviceChallengeFalllbackPage.clickOktaVerifyButton();
     const deviceChallengePollPageObject = new DeviceChallengePollPageObject(t);
     await t.expect(deviceChallengePollPageObject.getBeaconClass()).contains(BEACON_CLASS);
-    await t.expect(deviceChallengePollPageObject.getHeader()).eql('Sign in using Okta Verify on this device');
+    await t.expect(deviceChallengePollPageObject.getHeader()).eql('Sign in with Okta Fastpass');
     await t.expect(deviceChallengePollPageObject.getSpinner().getStyleProperty('display')).eql('block');
     await t.expect(deviceChallengePollPageObject.getPrimiaryButtonText()).eql('Reopen Okta Verify');
     await t.expect(deviceChallengePollPageObject.getFooterLink().exists).eql(false);
