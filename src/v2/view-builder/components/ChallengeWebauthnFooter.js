@@ -61,8 +61,4 @@ export default AuthenticatorFooter.extend({
 
     return links;
   },
-
-  postRender: function() {
-    this.$('.js-help-description').hide();
-  },
 });

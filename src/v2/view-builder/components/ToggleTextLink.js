@@ -24,11 +24,16 @@ export default View.extend({
         'aria-expanded': false,
         'clickHandler': function() {
           $(textViewOptions.selector).slideToggle(200, () => {
-            $(textViewOptions.selector).attr('aria-expanded', false);
+            $(textViewOptions.selector).attr('aria-expanded', $(textViewOptions.select).is(':visible'));
           });
         }
       });
     this.add(Link, { options: linkOptions });
     this.add(textViewOptions.view);
-  }
+  },
+
+  postRender() {
+    const textViewOptions = this.options.additionalOptions;
+    this.$(textViewOptions.selector).hide();
+  },
 });

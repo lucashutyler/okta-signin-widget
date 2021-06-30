@@ -235,8 +235,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     const cantVerifyLink = document.getElementsByClassName('link js-cant-verify');
     cantVerifyLink[0].click();
     expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
-    expect(testContext.view.$('.js-help-description')[0].textContent).toMatchInlineSnapshot(
-      '"Are you trying to use a biometric authenticator?Biometric authenticators (fingerprint, face recognition, PIN) will only work on the same device on which they were set up.If available, set up another security method on the device you used to set up your biometric authenticator.Are you trying to use a security key?If you have set up a security key, insert it in a USB port when prompted by the browser and tap on the button or gold disk. Security keys can work on multiple devices."'
+    expect(testContext.view.$('.js-help-description').first().html()).toMatchInlineSnapshot(
+      '"<h3>Are you trying to use a biometric authenticator?</h3><br><p>Biometric authenticators (fingerprint, face recognition, PIN) will only work on the same device on which they were set up.</p><br><p>If available, set up another security method on the device you used to set up your biometric authenticator.</p><br><h3>Are you trying to use a security key?</h3><br><p>If you have set up a security key, insert it in a USB port when prompted by the browser and tap on the button or gold disk. Security keys can work on multiple devices.</p><br>"'
     );
   });
 
@@ -284,8 +284,8 @@ describe('v2/view-builder/views/webauthn/ChallengeWebauthnView', function() {
     const cantVerifyLink = document.getElementsByClassName('link js-cant-verify');
     cantVerifyLink[0].click();
     expect(testContext.view.$('.js-help-description').css('display')).toBe('block');
-    expect(testContext.view.$('.js-help-description')[0].textContent).toMatchInlineSnapshot(
-      '"Open your Okta Dashboard (e.g. yourcompany.okta.com) on the device you used to setup your security key or biometric authenticatorGo to Settings > Security MethodsOn Okta Verify, click \\"Set up\\"Scan the QR code using Okta Verify and follow instructions to finish enrolling your account"'
+    expect(testContext.view.$('.js-help-description').first().html()).toMatchInlineSnapshot(
+      '"<ol class=\\"ov-enrollment-info\\"><li>Open your Okta Dashboard (e.g. yourcompany.okta.com) on the device you used to setup your security key or biometric authenticator</li><br><li>Go to Settings &gt; Security Methods</li><br><li>On Okta Verify, click \\"Set up\\"</li><br><li>Scan the QR code using Okta Verify and follow instructions to finish enrolling your account<br></li></ol>"'
     );
   });
 });
