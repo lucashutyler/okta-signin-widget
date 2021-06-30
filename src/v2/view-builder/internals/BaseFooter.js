@@ -67,7 +67,7 @@ export default View.extend({
       if (link.type === 'toggle-text-link') {
         LinkView = ToggleTextLink;
       }
-      this.add(LinkView, { options: link, });
+      this.add(LinkView, { options: link });
     });
 
     if (footerInfo) {

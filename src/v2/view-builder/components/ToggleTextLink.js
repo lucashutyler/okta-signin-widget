@@ -18,13 +18,14 @@ export default View.extend({
   initialize() {
     BaseView.prototype.initialize.apply(this, arguments);
     const textViewOptions = this.options.additionalOptions;
+    const linkName = this.options.name;
     const linkOptions = Object.assign({}, this.options,
       {
         'type': 'link',
         'aria-expanded': false,
         'clickHandler': function() {
           $(textViewOptions.selector).slideToggle(200, () => {
-            $(textViewOptions.selector).attr('aria-expanded', $(textViewOptions.select).is(':visible'));
+            $(`js-${linkName}`).attr('aria-expanded', $(textViewOptions.selector).is(':visible'));
           });
         }
       });
