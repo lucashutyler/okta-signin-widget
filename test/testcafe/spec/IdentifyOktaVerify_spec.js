@@ -53,9 +53,9 @@ test('should the correct title', async t => {
 test('should the correct content', async t => {
   const identityPage = await setup(t);
   await t.expect(identityPage.getPageTitle()).eql('Sign In');
-  await t.expect(identityPage.getOktaVerifyButtonText()).eql('Sign in with Okta Fastpass');
+  await t.expect(identityPage.getOktaVerifyButtonText()).eql('Sign in with Okta FastPass');
   await t.expect(identityPage.getSeparationLineText()).eql('or');
   await identityPage.clickOktaVerifyButton();
   const header = new Selector('h2[data-se="o-form-head"]');
-  await t.expect(header.textContent).eql('Sign in with Okta Fastpass');
+  await t.expect(header.textContent).eql('Sign in with Okta FastPass');
 });
