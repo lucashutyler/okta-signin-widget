@@ -16,7 +16,7 @@ import { getV1ClassName } from '../ion/ViewClassNamesFactory';
 import { FORMS, TERMINAL_FORMS, FORM_NAME_TO_OPERATION_MAP } from '../ion/RemediationConstants';
 import Util from '../../util/Util';
 import sessionStorageHelper from '../client/sessionStorageHelper';
-import { clearTransactionMeta } from '../client';
+import { clearTransactionMeta, startLoginFlow } from '../client';
 
 export default Controller.extend({
   className: 'form-controller',
@@ -156,6 +156,19 @@ export default Controller.extend({
         .then(this.handleIdxSuccess.bind(this))
         .catch(error => {
           this.showFormErrors(this.formView.model, error);
+        })
+        .then(() => {
+          if (actionPath === 'cancel') {
+            // Restart login flow
+            this.options.settings.restoreOieSettings();
+            startLoginFlow(this.options.settings)
+              .then(idxResp => {
+                this.handleIdxSuccess(idxResp);
+              })
+              .catch(err => {
+                this.showFormErrors(this.formView.model, err);
+              });
+          }
         });
     } else {
       this.options.settings.callGlobalError(`Invalid action selected: ${actionPath}`);
