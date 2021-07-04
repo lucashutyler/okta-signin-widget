@@ -211,7 +211,6 @@ export default Router.extend({
     // and remove it from `settings` afterwards as IDX response always has
     // state token (which will be set into AppState)
     if (this.settings.get('oieEnabled')) {
-      console.log('startLoginFlow...')
       return startLoginFlow(this.settings)
         .then(idxResp => {
           this.settings.unsetOieSettings();
