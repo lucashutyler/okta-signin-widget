@@ -158,7 +158,7 @@ export default Controller.extend({
           this.showFormErrors(this.formView.model, error);
         })
         .then(() => {
-          if (actionPath === 'cancel_____') {
+          if (actionPath === 'cancel') {
             // Restart login flow
             this.options.settings.restoreOieSettings();
             startLoginFlow(this.options.settings)
