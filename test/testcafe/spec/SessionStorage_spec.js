@@ -261,3 +261,37 @@ test.requestHooks(credentialSSONotExistLogger, credentialSSONotExistMock)('shall
   )).eql(1);
   await t.expect(getStateHandleFromSessionStorage()).eql(null);
 });
+
+test.requestHooks(identifyChallengeMock)('shall back to sign-in and authenticate succesfully', async t => {
+  const identityPage = new IdentityPageObject(t);
+  const challengeEmailPageObject = new ChallengeEmailPageObject(t);
+  let pageTitle;
+
+  // Identify page
+  await identityPage.navigateToPage();
+  await identityPage.fillIdentifierField('foo@test.com');
+  await identityPage.clickNextButton();
+
+  // Email challenge page - click 'Back to sign-in'
+  pageTitle = challengeEmailPageObject.form.getTitle();
+  await t.expect(pageTitle).eql('Verify with your email');
+  await challengeEmailPageObject.clickSignOutLink();
+
+  // Go back to Identify page
+  pageTitle = identityPage.form.getTitle();
+  await t.expect(pageTitle).eql('Sign In');
+  await identityPage.fillIdentifierField('foo@test.com');
+  await identityPage.clickNextButton();
+
+  // Email challenge page - verify
+  pageTitle = challengeEmailPageObject.form.getTitle();
+  await t.expect(pageTitle).eql('Verify with your email');
+  await challengeEmailPageObject.verifyFactor('credentials.passcode', '1234');
+  await challengeEmailPageObject.clickNextButton();
+
+  // Success page
+  const pageUrl = await successPage.getPageUrl();
+  await t.expect(pageUrl)
+    .eql('http://localhost:3000/app/UserHome?stateToken=mockedStateToken123');
+  await t.expect(getStateHandleFromSessionStorage()).eql(null);
+});
