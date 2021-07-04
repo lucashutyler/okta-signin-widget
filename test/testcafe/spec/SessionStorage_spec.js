@@ -265,6 +265,7 @@ test.requestHooks(credentialSSONotExistLogger, credentialSSONotExistMock)('shall
 test.requestHooks(identifyChallengeMock)('shall back to sign-in and authenticate succesfully', async t => {
   const identityPage = new IdentityPageObject(t);
   const challengeEmailPageObject = new ChallengeEmailPageObject(t);
+  const successPage = new SuccessPageObject(t);
   let pageTitle;
 
   // Identify page
