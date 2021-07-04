@@ -263,6 +263,14 @@ test.requestHooks(credentialSSONotExistLogger, credentialSSONotExistMock)('shall
 });
 
 test.requestHooks(identifyChallengeMock)('shall back to sign-in and authenticate succesfully', async t => {
+  // Add challenge success mock
+  const challengeSuccessMock = RequestMock()
+    // .onRequestTo('http://localhost:3000/idp/idx/introspect')
+    // .respond(xhrEmailVerification)
+    .onRequestTo('http://localhost:3000/idp/idx/challenge/answer')
+    .respond(xhrSuccess);
+  await t.addRequestHooks(challengeSuccessMock);
+  
   const identityPage = new IdentityPageObject(t);
   const challengeEmailPageObject = new ChallengeEmailPageObject(t);
   const successPage = new SuccessPageObject(t);
