@@ -134,6 +134,7 @@ export default Controller.extend({
     const idx = this.options.appState.get('idx');
 
     if (actionPath === 'cancel') {
+      console.log('clearing..')
       clearTransactionMeta(this.options.settings);
       sessionStorageHelper.removeStateHandle();
       this.options.appState.clearAppStateCache();
