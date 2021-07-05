@@ -274,7 +274,7 @@ test.requestHooks(identifyChallengeMock)('shall back to sign-in and authenticate
     .onRequestTo('http://localhost:3000/idp/idx/challenge/answer')
     .respond(xhrSuccessWithInteractionCode)
     .onRequestTo('http://localhost:3000/oauth2/default/v1/token')
-    .respond(xhrSuccessTokens)
+    .respond(xhrSuccessTokens);
   await t.addRequestHooks(challengeSuccessMock);
 
   // Setup widget with interaction code flow
