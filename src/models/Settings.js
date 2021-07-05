@@ -27,9 +27,6 @@ const DEFAULT_LANGUAGE = 'en';
 const ConfigError = Errors.ConfigError;
 const UnsupportedBrowserError = Errors.UnsupportedBrowserError;
 const assetBaseUrlTpl = hbs('https://global.oktacdn.com/okta-signin-widget/{{version}}');
-const oieKeys = [
-  'stateToken', 'proxyIdxResponse', 'useInteractionCodeFlow'
-];
 export default Model.extend({
   authClient: undefined,
 
@@ -534,20 +531,4 @@ export default Model.extend({
     return false;
   },
 
-  unsetOieSettings: function() {
-    // Save for future restore
-    this._oieSettings = {};
-    for (const k of oieKeys) {
-      this._oieSettings[k] = this.get(k);
-      this.unset(k);
-    }
-  },
-
-  restoreOieSettings: function() {
-    if (this._oieSettings) {
-      for (const k of oieKeys) {
-        this.set(k, this._oieSettings[k]);
-      }
-    }
-  },
 });

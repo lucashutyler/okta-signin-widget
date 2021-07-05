@@ -213,12 +213,16 @@ export default Router.extend({
     if (this.settings.get('oieEnabled')) {
       return startLoginFlow(this.settings)
         .then(idxResp => {
-          this.settings.unsetOieSettings();
+          this.settings.unset('stateToken');
+          this.settings.unset('proxyIdxResponse');
+          this.settings.unset('useInteractionCodeFlow');
           this.appState.trigger('remediationSuccess', idxResp);
           this.render(Controller, options);
         })
         .catch(errorResp => {
-          this.settings.unsetOieSettings();
+          this.settings.unset('stateToken');
+          this.settings.unset('proxyIdxResponse');
+          this.settings.unset('useInteractionCodeFlow');
           this.appState.trigger('remediationError', errorResp.error || errorResp);
           this.render(Controller, options);
         });

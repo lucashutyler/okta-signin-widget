@@ -160,7 +160,7 @@ export default Controller.extend({
         .then(() => {
           if (actionPath === 'cancel') {
             // Restart login flow
-            this.options.settings.restoreOieSettings();
+            this.settings.set('useInteractionCodeFlow', true);
             startLoginFlow(this.options.settings)
               .then(idxResp => {
                 this.handleIdxSuccess(idxResp);
